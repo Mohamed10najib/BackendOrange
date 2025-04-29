@@ -35,6 +35,29 @@ public class UserServiceImplement implements UserServiceInterface, UserDetailsSe
         System.out.println(user.getNumero());
         return user;
     }
+
+    @Override
+    public AppUser GetUserByEmail(String email) {
+        String cleanedEmail = email.trim();
+        AppUser user = UserRepo.findByEmail(cleanedEmail);
+
+        if (user == null) {
+            throw new NoSuchElementException("User not found with email: " + cleanedEmail);
+        }
+
+        System.out.println(user.getEmail());
+        return user;
+
+    }
+    public boolean isEmailExists(String email) {
+        return UserRepo.existsByEmail(email);
+    }
+
+
+    public boolean isPhoneNumberExists(String numero) {
+        return UserRepo.existsByNumero(numero);
+    }
+
     @Override
     public AppRole GetRoleByName(String RoleName) {
         AppRole role = null ;

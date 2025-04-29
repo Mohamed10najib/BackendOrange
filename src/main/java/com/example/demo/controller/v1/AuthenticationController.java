@@ -77,6 +77,23 @@ public class AuthenticationController {
         this.UserService.AddNewUser(user);
         return "signUP";
     }
+    @GetMapping("/Verification/{email}/{numero}")
+    public String Verification(@PathVariable String email,@PathVariable String numero) {
+        boolean EmailIsExist = UserService.isEmailExists(email);
+        boolean NumeroIsExist = UserService.isPhoneNumberExists(numero);
+        if(EmailIsExist && NumeroIsExist){
+            return "Email et numéro de téléphone existent déjà";
+        }else {
+            if(EmailIsExist){
+                return "L'email existe déjà.";
+            }else if(NumeroIsExist){
+                return "Le numéro de téléphone existe déjà.";
+            }else{
+                return "Correct";
+            }
+        }
+
+    }
 
 
 }
