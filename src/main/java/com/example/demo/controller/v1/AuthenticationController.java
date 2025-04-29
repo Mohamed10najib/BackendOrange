@@ -5,6 +5,7 @@ import com.example.demo.Dto.AuthenticationResponse;
 import com.example.demo.Dto.RegisterRequest;
 import com.example.demo.component.TokenClass;
 import com.example.demo.entity.AppUser;
+import com.example.demo.serivces.EmailService;
 import com.example.demo.serivces.ServiceImplement.JwtService;
 import com.example.demo.serivces.ServiceInterface.UserServiceInterface;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +30,15 @@ public class AuthenticationController {
     private final UserDetailsService userDetailsService;
     private  final UserServiceInterface UserService;
     private  final TokenClass serviceToken;
-
-    public AuthenticationController(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService, UserDetailsService userDetailsService, UserServiceInterface userService, TokenClass serviceToken) {
+    private final EmailService emailService;
+    public AuthenticationController(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService, UserDetailsService userDetailsService, UserServiceInterface userService, TokenClass serviceToken, EmailService emailService) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.UserService = userService;
         this.serviceToken = serviceToken;
+        this.emailService = emailService;
     }
 
     @PostMapping("/login")
@@ -75,6 +77,21 @@ public class AuthenticationController {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         this.UserService.AddNewUser(user);
+        String subject = "Bienvenue sur l'application Orange Alert !";
+
+        String message = String.format("""
+Bonjour %s,
+
+Nous sommes ravis de vous accueillir sur Orange Alert, notre application dédiée à la déclaration et au suivi de vos problèmes de réseau.
+
+Votre compte a bien été créé, et vous pouvez dès à présent signaler tout dysfonctionnement que vous rencontrez.
+Notre équipe est là pour vous accompagner et vous offrir une assistance rapide et efficace.
+
+Bienvenue parmi nous,
+L’équipe Orange Alert
+""",request.getFirstName()+" "+request.getLastName());
+        System.out.println(request.getEmail());
+        emailService.sendEmail(request.getEmail().trim(), subject,message);
         return "signUP";
     }
     @GetMapping("/Verification/{email}/{numero}")
